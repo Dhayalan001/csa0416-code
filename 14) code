@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+#define MAX_FILENAMES 100
+#define MAX_FILENAME_LENGTH 100
+#define DIRECTORY_NAME "organized_files"
+
+int main() {
+    char filenames[MAX_FILENAMES][MAX_FILENAME_LENGTH];
+    char directory_path[MAX_FILENAME_LENGTH];
+    char filename[MAX_FILENAME_LENGTH];
+    int num_files;
+    int i;
+
+    // Create a directory to organize files
+    sprintf(directory_path, "%s", DIRECTORY_NAME);
+    mkdir(directory_path, 0777);
+
+    // Read filenames from user
+    printf("Enter number of files: ");
+    scanf("%d", &num_files);
+    getchar(); // consume newline character
+
+    printf("Enter %d filenames:\n", num_files);
+    for (i = 0; i < num_files; i++) {
+        fgets(filenames[i], MAX_FILENAME_LENGTH, stdin);
+        // Remove newline character at the end of filename
+        filenames[i][strcspn(filenames[i], "\n")] = 0;
+    }
+
+    // Move files into the directory
+    for (i = 0; i < num_files; i++) {
+        sprintf(filename, "%s/%s", directory_path, filenames[i]);
+        rename(filenames[i], filename);
+        printf("Moved %s to %s\n", filenames[i], filename);
+    }
+
+    printf("Files organized successfully!\n");
+
+    return 0;
+}
