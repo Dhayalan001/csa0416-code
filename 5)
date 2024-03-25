@@ -1,0 +1,58 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Process structure
+typedef struct {
+    int id;         // Process ID
+    int priority;   // Priority of the process
+} Process;
+
+// Function to select the process with the highest priority
+Process selectHighestPriority(Process *processes, int numProcesses) {
+    int highestPriority = -1;
+    int selectedIndex = -1;
+
+    // Iterate through processes to find the highest priority process
+    for (int i = 0; i < numProcesses; i++) {
+        if (processes[i].priority > highestPriority) {
+            highestPriority = processes[i].priority;
+            selectedIndex = i;
+        }
+    }
+
+    // Return the process with the highest priority
+    return processes[selectedIndex];
+}
+
+int main() {
+    int numProcesses;
+
+    // Input the number of processes
+    printf("Enter the number of processes: ");
+    scanf("%d", &numProcesses);
+
+    // Allocate memory for the processes
+    Process *processes = (Process *)malloc(numProcesses * sizeof(Process));
+
+    // Input process IDs and priorities
+    printf("Enter process IDs and priorities:\n");
+    for (int i = 0; i < numProcesses; i++) {
+        printf("Process %d ID: ", i + 1);
+        scanf("%d", &processes[i].id);
+        printf("Process %d priority: ", i + 1);
+        scanf("%d", &processes[i].priority);
+    }
+
+    // Select the process with the highest priority
+    Process selectedProcess = selectHighestPriority(processes, numProcesses);
+
+    // Output the selected process
+    printf("\nProcess with the highest priority:\n");
+    printf("ID: %d\n", selectedProcess.id);
+    printf("Priority: %d\n", selectedProcess.priority);
+
+    // Free allocated memory
+    free(processes);
+
+    return 0;
+}
