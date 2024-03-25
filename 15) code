@@ -1,0 +1,116 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_DIRS 100
+#define MAX_FILES_PER_DIR 100
+#define MAX_NAME_LENGTH 50
+
+typedef struct {
+    char name[MAX_NAME_LENGTH];
+} File;
+
+typedef struct {
+    char name[MAX_NAME_LENGTH];
+    File files[MAX_FILES_PER_DIR];
+    int num_files;
+} Directory;
+
+Directory directories[MAX_DIRS];
+int num_dirs = 0;
+
+Directory* current_directory = NULL;
+
+void create_directory(char *name) {
+    if (num_dirs >= MAX_DIRS) {
+        printf("Maximum directories reached.\n");
+        return;
+    }
+
+    Directory new_dir;
+    strcpy(new_dir.name, name);
+    new_dir.num_files = 0;
+
+    directories[num_dirs++] = new_dir;
+    printf("Directory '%s' created successfully.\n", name);
+}
+
+void list_directories() {
+    printf("Directories:\n");
+    for (int i = 0; i < num_dirs; i++) {
+        printf("%s\n", directories[i].name);
+    }
+}
+
+void change_directory(char *name) {
+    for (int i = 0; i < num_dirs; i++) {
+        if (strcmp(directories[i].name, name) == 0) {
+            current_directory = &directories[i];
+            printf("Changed to directory '%s'\n", name);
+            return;
+        }
+    }
+    printf("Directory '%s' not found.\n", name);
+}
+
+void create_file(char *name) {
+    if (current_directory == NULL) {
+        printf("Please change to a directory first.\n");
+        return;
+    }
+
+    if (current_directory->num_files >= MAX_FILES_PER_DIR) {
+        printf("Maximum files per directory reached.\n");
+        return;
+    }
+
+    File new_file;
+    strcpy(new_file.name, name);
+
+    current_directory->files[current_directory->num_files++] = new_file;
+    printf("File '%s' created successfully in directory '%s'.\n", name, current_directory->name);
+}
+
+void list_files() {
+    if (current_directory == NULL) {
+        printf("Please change to a directory first.\n");
+        return;
+    }
+
+    printf("Files in directory '%s':\n", current_directory->name);
+    for (int i = 0; i < current_directory->num_files; i++) {
+        printf("%s\n", current_directory->files[i].name);
+    }
+}
+
+int main() {
+    char input[100];
+    char command[50], argument[50];
+
+    printf("Welcome to the Two-level Directory File Management System!\n");
+
+    while (1) {
+        printf("\nEnter a command (create_dir, list_dirs, change_dir, create_file, list_files, exit):\n");
+        fgets(input, sizeof(input), stdin);
+        sscanf(input, "%s %s", command, argument);
+
+        if (strcmp(command, "create_dir") == 0) {
+            create_directory(argument);
+        } else if (strcmp(command, "list_dirs") == 0) {
+            list_directories();
+        } else if (strcmp(command, "change_dir") == 0) {
+            change_directory(argument);
+        } else if (strcmp(command, "create_file") == 0) {
+            create_file(argument);
+        } else if (strcmp(command, "list_files") == 0) {
+            list_files();
+        } else if (strcmp(command, "exit") == 0) {
+            printf("Exiting...\n");
+            break;
+        } else {
+            printf("Invalid command.\n");
+        }
+    }
+
+    return 0;
+}
