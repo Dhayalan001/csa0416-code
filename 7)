@@ -1,0 +1,67 @@
+#include<stdio.h>
+
+struct Process {
+    int pid; // Process ID
+    int burst_time; // Burst time
+    int waiting_time; // Waiting time
+    int turnaround_time; // Turnaround time
+};
+
+// Function to perform SJF scheduling
+void sjf_scheduling(struct Process processes[], int n) {
+    int total_waiting_time = 0, total_turnaround_time = 0;
+    
+    // Sort processes based on burst time
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (processes[j].burst_time > processes[j + 1].burst_time) {
+                // Swap processes
+                struct Process temp = processes[j];
+                processes[j] = processes[j + 1];
+                processes[j + 1] = temp;
+            }
+        }
+    }
+    
+    // Calculate waiting time and turnaround time for each process
+    for (int i = 0; i < n; i++) {
+        if (i == 0) {
+            processes[i].waiting_time = 0;
+        } else {
+            processes[i].waiting_time = processes[i - 1].waiting_time + processes[i - 1].burst_time;
+        }
+        processes[i].turnaround_time = processes[i].waiting_time + processes[i].burst_time;
+        total_waiting_time += processes[i].waiting_time;
+        total_turnaround_time += processes[i].turnaround_time;
+    }
+    
+    // Display scheduling information
+    printf("Process ID\tBurst Time\tWaiting Time\tTurnaround Time\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t\t%d\t\t%d\t\t%d\n", processes[i].pid, processes[i].burst_time, processes[i].waiting_time, processes[i].turnaround_time);
+    }
+    
+    // Display average waiting time and average turnaround time
+    printf("\nAverage Waiting Time: %.2f\n", (float)total_waiting_time / n);
+    printf("Average Turnaround Time: %.2f\n", (float)total_turnaround_time / n);
+}
+
+int main() {
+    int n;
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+    
+    struct Process processes[n];
+    
+    // Input burst time for each process
+    for (int i = 0; i < n; i++) {
+        processes[i].pid = i + 1;
+        printf("Enter burst time for Process %d: ", i + 1);
+        scanf("%d", &processes[i].burst_time);
+    }
+    
+    // Perform SJF scheduling
+    sjf_scheduling(processes, n);
+    
+    return 0;
+}
