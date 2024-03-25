@@ -1,0 +1,185 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MEMORY_SIZE 1000
+
+// Linked List Node for representing memory blocks
+typedef struct Node {
+    int start_address;
+    int size;
+    struct Node* next;
+} Node;
+
+Node* memory = NULL;
+
+// Function to initialize memory
+void initialize_memory() {
+    memory = (Node*)malloc(sizeof(Node));
+    memory->start_address = 0;
+    memory->size = MEMORY_SIZE;
+    memory->next = NULL;
+}
+
+// Function to display memory blocks
+void display_memory() {
+    Node* temp = memory;
+    printf("Memory Layout:\n");
+    while (temp != NULL) {
+        printf("[%d - %d] : %d bytes\n", temp->start_address, temp->start_address + temp->size - 1, temp->size);
+        temp = temp->next;
+    }
+}
+
+// Function to allocate memory using First Fit strategy
+void first_fit(int process_size) {
+    Node* current = memory;
+    Node* prev = NULL;
+
+    while (current != NULL) {
+        if (current->size >= process_size) {
+            // Allocate memory block
+            Node* new_block = (Node*)malloc(sizeof(Node));
+            new_block->start_address = current->start_address;
+            new_block->size = process_size;
+            new_block->next = NULL;
+
+            // Adjust the memory block
+            current->start_address += process_size;
+            current->size -= process_size;
+
+            // Link the new block
+            if (prev == NULL) {
+                memory = new_block;
+            } else {
+                prev->next = new_block;
+            }
+            return;
+        }
+        prev = current;
+        current = current->next;
+    }
+
+    printf("Not enough memory for allocation using First Fit.\n");
+}
+
+// Function to allocate memory using Best Fit strategy
+void best_fit(int process_size) {
+    Node* current = memory;
+    Node* prev = NULL;
+    Node* best_fit_block = NULL;
+
+    int min_fragmentation = MEMORY_SIZE + 1;
+
+    while (current != NULL) {
+        if (current->size >= process_size && current->size - process_size < min_fragmentation) {
+            best_fit_block = current;
+            min_fragmentation = current->size - process_size;
+        }
+        current = current->next;
+    }
+
+    if (best_fit_block != NULL) {
+        // Allocate memory block
+        Node* new_block = (Node*)malloc(sizeof(Node));
+        new_block->start_address = best_fit_block->start_address;
+        new_block->size = process_size;
+        new_block->next = NULL;
+
+        // Adjust the memory block
+        best_fit_block->start_address += process_size;
+        best_fit_block->size -= process_size;
+
+        // Link the new block
+        if (best_fit_block == memory) {
+            memory = new_block;
+        } else {
+            prev->next = new_block;
+        }
+    } else {
+        printf("Not enough memory for allocation using Best Fit.\n");
+    }
+}
+
+// Function to allocate memory using Worst Fit strategy
+void worst_fit(int process_size) {
+    Node* current = memory;
+    Node* prev = NULL;
+    Node* worst_fit_block = NULL;
+
+    int max_fragmentation = -1;
+
+    while (current != NULL) {
+        if (current->size >= process_size && current->size - process_size > max_fragmentation) {
+            worst_fit_block = current;
+            max_fragmentation = current->size - process_size;
+        }
+        current = current->next;
+    }
+
+    if (worst_fit_block != NULL) {
+        // Allocate memory block
+        Node* new_block = (Node*)malloc(sizeof(Node));
+        new_block->start_address = worst_fit_block->start_address;
+        new_block->size = process_size;
+        new_block->next = NULL;
+
+        // Adjust the memory block
+        worst_fit_block->start_address += process_size;
+        worst_fit_block->size -= process_size;
+
+        // Link the new block
+        if (worst_fit_block == memory) {
+            memory = new_block;
+        } else {
+            prev->next = new_block;
+        }
+    } else {
+        printf("Not enough memory for allocation using Worst Fit.\n");
+    }
+}
+
+int main() {
+    int choice, process_size;
+
+    // Initialize memory
+    initialize_memory();
+
+    do {
+        printf("\nMemory Allocation Strategies:\n");
+        printf("1. First Fit\n");
+        printf("2. Best Fit\n");
+        printf("3. Worst Fit\n");
+        printf("4. Display Memory\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter process size: ");
+                scanf("%d", &process_size);
+                first_fit(process_size);
+                break;
+            case 2:
+                printf("Enter process size: ");
+                scanf("%d", &process_size);
+                best_fit(process_size);
+                break;
+            case 3:
+                printf("Enter process size: ");
+                scanf("%d", &process_size);
+                worst_fit(process_size);
+                break;
+            case 4:
+                display_memory();
+                break;
+            case 5:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice. Please enter a number between 1 and 5.\n");
+        }
+    } while (choice != 5);
+
+    return 0;
+}
