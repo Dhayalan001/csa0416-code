@@ -1,0 +1,48 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    FILE *filePointer;
+    char fileName[100];
+    char data[1000];
+
+    printf("Enter the file name: ");
+    scanf("%s", fileName);
+
+    // Creating a new file
+    filePointer = fopen(fileName, "w");
+
+    if (filePointer == NULL) {
+        printf("File creation failed.\n");
+        return 1;
+    }
+
+    printf("Enter data to write to the file (press Enter then Ctrl+D to finish):\n");
+    while (fgets(data, sizeof(data), stdin) != NULL) {
+        fputs(data, filePointer);
+    }
+
+    // Close the file
+    fclose(filePointer);
+
+    // Open the file for reading
+    filePointer = fopen(fileName, "r");
+
+    if (filePointer == NULL) {
+        printf("File opening failed.\n");
+        return 1;
+    }
+
+    printf("\nContents of %s:\n", fileName);
+
+    // Read and display the contents of the file
+    while (fgets(data, sizeof(data), filePointer) != NULL) {
+        printf("%s", data);
+    }
+
+    // Close the file
+    fclose(filePointer);
+
+    return 0;
+}
+
