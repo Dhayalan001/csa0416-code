@@ -1,0 +1,96 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MEMORY_SIZE 100
+
+// Structure to represent a block of memory
+struct MemoryBlock {
+    int start_address;
+    int size;
+    bool allocated;
+};
+
+// Function to initialize memory blocks
+void initializeMemory(struct MemoryBlock memory[], int n) {
+    for (int i = 0; i < n; i++) {
+        memory[i].start_address = i * MEMORY_SIZE / n;
+        memory[i].size = MEMORY_SIZE / n;
+        memory[i].allocated = false;
+    }
+}
+
+// Function to display memory blocks
+void displayMemory(struct MemoryBlock memory[], int n) {
+    printf("Memory Blocks:\n");
+    for (int i = 0; i < n; i++) {
+        printf("Block %d: [%d - %d] %s\n", i + 1, memory[i].start_address,
+               memory[i].start_address + memory[i].size - 1,
+               memory[i].allocated ? "Allocated" : "Free");
+    }
+    printf("\n");
+}
+
+// Function to allocate memory using First Fit algorithm
+void allocateMemory(struct MemoryBlock memory[], int n, int process_size) {
+    for (int i = 0; i < n; i++) {
+        if (!memory[i].allocated && memory[i].size >= process_size) {
+            memory[i].allocated = true;
+            printf("Memory allocated successfully. Block: %d\n", i + 1);
+            return;
+        }
+    }
+    printf("Memory allocation failed. No suitable block found.\n");
+}
+
+// Function to deallocate memory
+void deallocateMemory(struct MemoryBlock memory[], int n, int block_number) {
+    if (block_number < 1 || block_number > n) {
+        printf("Invalid block number.\n");
+        return;
+    }
+    if (!memory[block_number - 1].allocated) {
+        printf("Block %d is already free.\n", block_number);
+        return;
+    }
+    memory[block_number - 1].allocated = false;
+    printf("Memory deallocated successfully. Block: %d\n", block_number);
+}
+
+int main() {
+    struct MemoryBlock memory[5]; // Assuming 5 memory blocks
+    initializeMemory(memory, 5);
+
+    int choice, process_size, block_number;
+
+    do {
+        printf("1. Allocate Memory\n");
+        printf("2. Deallocate Memory\n");
+        printf("3. Display Memory\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter process size to allocate: ");
+                scanf("%d", &process_size);
+                allocateMemory(memory, 5, process_size);
+                break;
+            case 2:
+                printf("Enter block number to deallocate: ");
+                scanf("%d", &block_number);
+                deallocateMemory(memory, 5, block_number);
+                break;
+            case 3:
+                displayMemory(memory, 5);
+                break;
+            case 4:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice. Please enter a valid option.\n");
+        }
+    } while (choice != 4);
+
+    return 0;
+}
